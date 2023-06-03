@@ -23,6 +23,15 @@ fn it_works_for_create(){
             Error::<Test>::InvalidKittyId
         );
 
+        // check whether create event emitted
+        System::set_block_number(1);
+
+        assert_eq!(System::events().len(), 1);
+
+        let kitty=KittiesModule::kitties(kitty_id).unwrap();
+
+        System::assert_has_event(crate::Event::<Test>::KittyCreated{who:account_id,kitty_id,kitty:kitty}.into());
+
     })
 
 }
@@ -40,19 +49,31 @@ fn it_works_for_breed(){
                     Error::<Test>::InvalidKittyId);     
 
         assert_ok!(KittiesModule::create(RuntimeOrigin::signed(account_id)));          
-        assert_ok!(KittiesModule::create(RuntimeOrigin::signed(account_id)));          
-        
-        assert_eq!(KittiesModule::next_kitty_id(),2);
+        assert_ok!(KittiesModule::create(RuntimeOrigin::signed(account_id))); 
+
+        assert_eq!(KittiesModule::next_kitty_id(),kitty_id+2);
 
         assert_ok!(KittiesModule::breed(RuntimeOrigin::signed(account_id),kitty_id,kitty_id+1));      
 
-        assert_eq!(KittiesModule::next_kitty_id(),3);
+        assert_eq!(KittiesModule::next_kitty_id(),kitty_id+3);
 
         assert_eq!(KittiesModule::kitties(2).is_some(),true);
 
         assert_eq!(KittiesModule::kitty_owner(2),Some(account_id));
 
         assert_eq!(KittiesModule::kitty_parents(2),Some((kitty_id,kitty_id+1)));
+
+
+        // check whether create event emitted
+        System::set_block_number(1);
+
+        assert_eq!(System::events().len(), 3);
+
+        let kitty=KittiesModule::kitties(kitty_id+2).unwrap();
+
+        System::assert_has_event(crate::Event::<Test>::KittyCreated{who:account_id,kitty_id,kitty:kitty}.into());
+        System::assert_has_event(crate::Event::<Test>::KittyCreated{who:account_id,kitty_id:kitty_id+1,kitty:kitty}.into());
+        System::assert_has_event(crate::Event::<Test>::KittyBreed {who:account_id,kitty_id:kitty_id+2,kitty:kitty}.into());
 
 
     });
@@ -81,7 +102,16 @@ fn it_works_for_transfer(){
 
         assert_eq!(KittiesModule::kitty_owner(kitty_id),Some(account_id));
 
-      //  System::assert_last_event(KittiesModule::deposit_event(event));
+      // check whether create event emitted
+      System::set_block_number(1);
+
+      assert_eq!(System::events().len(), 3);
+
+      let kitty=KittiesModule::kitties(kitty_id).unwrap();
+
+      System::assert_has_event(crate::Event::<Test>::KittyCreated{who:account_id,kitty_id,kitty:kitty}.into());
+      System::assert_has_event(crate::Event::<Test>::KittyTransferred {who:account_id,recipient: recipient_id,kitty_id:kitty_id}.into());
+      System::assert_has_event(crate::Event::<Test>::KittyTransferred {who:recipient_id,recipient: account_id,kitty_id:kitty_id}.into());
 
     });
 }
