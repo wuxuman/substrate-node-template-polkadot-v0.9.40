@@ -24,8 +24,6 @@ fn it_works_for_create(){
         );
 
         // check whether create event emitted
-        System::set_block_number(1);
-
         assert_eq!(System::events().len(), 1);
 
         let kitty=KittiesModule::kitties(kitty_id).unwrap();
@@ -64,9 +62,7 @@ fn it_works_for_breed(){
         assert_eq!(KittiesModule::kitty_parents(2),Some((kitty_id,kitty_id+1)));
 
 
-        // check whether create event emitted
-        System::set_block_number(1);
-
+        // check whether breed event emitted
         assert_eq!(System::events().len(), 3);
 
         let kitty=KittiesModule::kitties(kitty_id+2).unwrap();
@@ -102,9 +98,7 @@ fn it_works_for_transfer(){
 
         assert_eq!(KittiesModule::kitty_owner(kitty_id),Some(account_id));
 
-      // check whether create event emitted
-      System::set_block_number(1);
-
+      // check whether transfer event emitted
       assert_eq!(System::events().len(), 3);
 
       let kitty=KittiesModule::kitties(kitty_id).unwrap();
