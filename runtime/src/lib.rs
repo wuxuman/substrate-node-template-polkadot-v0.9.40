@@ -23,11 +23,13 @@ use sp_std::prelude::*;
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
+use pallet_insecure_randomness_collective_flip;
+
 // A few exports that help ease life for downstream crates.
 pub use frame_support::{
 	construct_runtime, parameter_types,
 	traits::{
-		ConstU128, ConstU32, ConstU64, ConstU8, KeyOwnerProofSystem, Randomness, StorageInfo,
+		ConstU128, ConstU32, ConstU64, ConstU8, KeyOwnerProofSystem, StorageInfo,
 	},
 	weights::{
 		constants::{
@@ -268,7 +270,15 @@ impl pallet_template::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 }
 
-// Create the runtime by composing the FRAME pallets that were previously configured.
+impl pallet_kitties::Config for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type Randomness = Randomness;
+}
+
+impl pallet_insecure_randomness_collective_flip::Config for Runtime{}
+
+
+// Create the runtime by composing the FRAME pallets that were prevpallet_insecure_raiously configured.
 construct_runtime!(
 	pub struct Runtime
 	where
@@ -285,6 +295,9 @@ construct_runtime!(
 		Sudo: pallet_sudo,
 		// Include the custom logic from the pallet-template in the runtime.
 		TemplateModule: pallet_template,
+		KittiesModule: pallet_kitties,
+		Randomness:pallet_insecure_randomness_collective_flip,
+
 	}
 );
 
