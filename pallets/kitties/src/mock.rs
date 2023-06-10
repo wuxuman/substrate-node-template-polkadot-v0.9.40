@@ -1,5 +1,5 @@
 use crate as pallet_kitties;
-use frame_support::traits::{ConstU16, ConstU64};
+use frame_support::{traits::{ConstU16,ConstU32, ConstU64,ConstU128}, parameter_types, PalletId};
 use sp_core::H256;
 use sp_runtime::{
 	testing::Header,
@@ -21,6 +21,7 @@ frame_support::construct_runtime!(
 		System: frame_system,
 		KittiesModule: pallet_kitties,
 		Randomness:pallet_insecure_randomness_collective_flip,
+		Balances:pallet_balances,
 	}
 );
 
@@ -42,7 +43,7 @@ impl frame_system::Config for Test {
 	type BlockHashCount = ConstU64<250>;
 	type Version = ();
 	type PalletInfo = PalletInfo;
-	type AccountData = ();
+	type AccountData = pallet_balances::AccountData<Balance>;// why change value from () to pallet_balances::AccountData<Balance> then now compile error?
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 	type SystemWeightInfo = ();
@@ -51,12 +52,42 @@ impl frame_system::Config for Test {
 	type MaxConsumers = frame_support::traits::ConstU32<16>;
 }
 
+parameter_types! {
+	pub KittyPalletId:PalletId=PalletId(*b"py/kitty");
+}
+
+
 impl pallet_kitties::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
 	type Randomness=Randomness;
+	type Currency = Balances;
+	type KittyPrice = ConstU128<1000_000>;
+	type PalletId=KittyPalletId;
 }
 
 impl pallet_insecure_randomness_collective_flip::Config for Test{}
+
+pub type Balance = u128;
+pub const EXISTENTIAL_DEPOSIT: u128 = 500;
+
+impl pallet_balances::Config for Test{
+  type MaxLocks = ConstU32<50>;
+  type MaxReserves = ();
+  type ReserveIdentifier = [u8; 8];
+  /// The type for recording an account's balance.
+  type Balance = Balance;
+  /// The ubiquitous event type.
+  type RuntimeEvent = RuntimeEvent;
+  /// The empty value, (), is used to specify a no-op callback function.
+  type DustRemoval = ();
+  /// Set the minimum balanced required for an account to exist on-chain
+  type ExistentialDeposit = ConstU128<EXISTENTIAL_DEPOSIT>;
+  /// The FRAME runtime system is used to track the accounts that hold balances.
+  type AccountStore = System;
+  /// Weight information is supplied to the Balances pallet by the node template runtime.
+  type WeightInfo = pallet_balances::weights::SubstrateWeight<Test>;
+
+}
 
 // Build genesis storage according to the mock runtime.
 pub fn new_test_ext() -> sp_io::TestExternalities {
