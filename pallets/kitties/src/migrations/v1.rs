@@ -21,16 +21,16 @@ pub fn migrate<T:crate::Config>() ->Weight{
         return Weight::zero();
     }
 
-    let module=crate::Kitties::<T>::module_prefix();
-    let item=crate::Kitties::<T>::storage_prefix();
+    // let module=crate::Kitties::<T>::module_prefix();
+    // let item=crate::Kitties::<T>::storage_prefix();
 
-    for (index,kitty) in storage_key_iter::<crate::KittyId, OldKitty,Blake2_128Concat>(module, item).drain(){
-        let new_kitty=crate::Kitty{
-            dna:kitty.0,
-            name:*b"abcd",
-        };
-        crate::Kitties::<T>::insert(index,&new_kitty);
-    }
+    // for (index,kitty) in storage_key_iter::<crate::KittyId, OldKitty,Blake2_128Concat>(module, item).drain(){
+    //     let new_kitty=crate::Kitty{
+    //         dna:kitty.0,
+    //         name:*b"abcd",
+    //     };
+    //     crate::Kitties::<T>::insert(index,&new_kitty);
+    // }
     Weight::zero()
 
 }
