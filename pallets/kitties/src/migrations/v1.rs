@@ -31,6 +31,7 @@ pub fn migrate<T:crate::Config>() ->Weight{
     //     };
     //     crate::Kitties::<T>::insert(index,&new_kitty);
     // }
+    StorageVersion::new(1).put::<crate::Pallet<T>>();
     Weight::zero()
 
 }
